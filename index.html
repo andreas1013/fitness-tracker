@@ -3,1195 +3,901 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Ashesh's Fitness Tracker</title>
+  <title>Ashesh's Health Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:        #080C14;
-      --surface:   #0E1520;
-      --card:      #141E2E;
-      --border:    #1E2D44;
-      --run:       #22C55E;
-      --bike:      #3B82F6;
-      --kb:        #F59E0B;
-      --rest:      #8B5CF6;
-      --longrun:   #EF4444;
-      --white:     #F0F4FF;
-      --muted:     #6B7A99;
-      --font:      'Space Grotesk', sans-serif;
-      --mono:      'JetBrains Mono', monospace;
+      --bg: #080C14; --surface: #0E1520; --card: #141E2E; --border: #1E2D44;
+      --run: #22C55E; --bike: #3B82F6; --kb: #F59E0B; --rest: #8B5CF6;
+      --food: #F97316; --dash: #06B6D4; --longrun: #EF4444;
+      --white: #F0F4FF; --muted: #6B7A99;
+      --font: 'Space Grotesk', sans-serif; --mono: 'JetBrains Mono', monospace;
     }
+    body { font-family: var(--font); background: var(--bg); color: var(--white); min-height: 100vh; overflow-x: hidden; }
 
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--white);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── Header ── */
-    .header {
-      background: linear-gradient(180deg, #0E1B30 0%, var(--bg) 100%);
-      padding: 20px 16px 16px;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-    }
+    /* HEADER */
+    .header { background: linear-gradient(180deg,#0E1B30 0%,var(--bg) 100%); padding: 16px 16px 12px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
     .header-top { display: flex; align-items: center; justify-content: space-between; }
-    .header h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+    .header h1 { font-size: 17px; font-weight: 700; }
     .header h1 span { color: var(--run); }
-    .week-badge {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-
-    /* ── Progress bar ── */
-    .progress-wrap { margin-top: 12px; }
-    .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+    .date-badge { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 3px 9px; border-radius: 20px; }
+    .progress-wrap { margin-top: 10px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
     .progress-label strong { color: var(--white); }
-    .progress-bar { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--run), #16A34A); border-radius: 4px; transition: width 0.4s ease; }
+    .progress-bar { height: 3px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg,var(--run),#16A34A); border-radius: 4px; transition: width 0.4s; }
 
-    /* ── Day tabs ── */
-    .tabs-wrap { overflow-x: auto; scrollbar-width: none; padding: 14px 16px 0; }
+    /* TABS */
+    .tabs-wrap { overflow-x: auto; scrollbar-width: none; padding: 12px 16px 0; }
     .tabs-wrap::-webkit-scrollbar { display: none; }
     .tabs { display: flex; gap: 8px; }
-    .tab {
-      flex: 0 0 auto;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 2px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      font-family: var(--font);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s;
-      letter-spacing: 0.5px;
-    }
-    .tab.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); }
-    .tab .tab-check { font-size: 10px; margin-left: 4px; opacity: 0; transition: opacity 0.2s; }
+    .tab { flex: 0 0 auto; padding: 7px 13px; border-radius: 10px; border: 2px solid var(--border); background: var(--surface); color: var(--muted); font-family: var(--font); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px; }
+    .tab.active { border-color: var(--accent); background: color-mix(in srgb,var(--accent) 15%,transparent); color: var(--accent); }
+    .tab .tab-check { font-size: 10px; margin-left: 3px; opacity: 0; transition: opacity 0.2s; }
     .tab.completed .tab-check { opacity: 1; }
 
-    /* ── Main content ── */
-    .main { padding: 16px; max-width: 600px; margin: 0 auto; }
+    /* PAGES */
+    .page { display: none; padding-bottom: 80px; }
+    .page.active { display: block; }
+    .main { padding: 14px 16px; max-width: 600px; margin: 0 auto; }
+    .section-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin: 16px 0 8px; }
 
-    /* ── Day header ── */
-    .day-header {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-    }
-    .day-header h2 { font-size: 20px; font-weight: 700; }
-    .day-header p { font-size: 13px; color: var(--muted); margin-top: 3px; }
-    .day-stats { display: flex; gap: 12px; margin-top: 10px; }
-    .stat-pill {
-      font-family: var(--mono);
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: color-mix(in srgb, var(--accent) 15%, transparent);
-      color: var(--accent);
-      border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-    }
+    /* DAY HEADER */
+    .day-header { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 12px; padding: 13px 15px; margin-bottom: 12px; }
+    .day-header h2 { font-size: 19px; font-weight: 700; }
+    .day-header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .day-stats { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .stat-pill { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 6px; background: color-mix(in srgb,var(--accent) 15%,transparent); color: var(--accent); border: 1px solid color-mix(in srgb,var(--accent) 30%,transparent); }
 
-    /* ── Activity cards ── */
-    .section-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--muted);
-      text-transform: uppercase;
-      margin: 18px 0 8px;
-    }
-
-    .activity-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      margin-bottom: 8px;
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-    .activity-card.done { border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
-    .activity-card.done .card-main { background: color-mix(in srgb, var(--accent) 6%, transparent); }
-
-    .card-main {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .card-main:active { background: color-mix(in srgb, var(--accent) 10%, transparent); }
-
-    .checkbox {
-      width: 24px;
-      height: 24px;
-      border-radius: 8px;
-      border: 2px solid var(--border);
-      background: var(--surface);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      font-size: 14px;
-    }
-    .activity-card.done .checkbox {
-      background: var(--accent);
-      border-color: var(--accent);
-    }
-
+    /* ACTIVITY CARDS */
+    .activity-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; }
+    .activity-card.done { border-color: color-mix(in srgb,var(--accent) 50%,transparent); }
+    .activity-card.done .card-main { background: color-mix(in srgb,var(--accent) 6%,transparent); }
+    .card-main { display: flex; align-items: center; gap: 12px; padding: 13px; cursor: pointer; transition: background 0.15s; }
+    .checkbox { width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--border); background: var(--surface); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 13px; }
+    .activity-card.done .checkbox { background: var(--accent); border-color: var(--accent); }
     .card-info { flex: 1; min-width: 0; }
     .card-name { font-size: 14px; font-weight: 600; }
-    .card-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .card-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .card-actions { display: flex; gap: 5px; align-items: center; }
+    .btn-info, .btn-video { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+    .btn-video { border-color: color-mix(in srgb,#EF4444 40%,transparent); color: #EF4444; }
 
-    .card-actions { display: flex; gap: 6px; align-items: center; }
-    .btn-info, .btn-video {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-      flex-shrink: 0;
-    }
-    .btn-video { border-color: color-mix(in srgb, #EF4444 40%, transparent); color: #EF4444; }
-    .btn-info:active, .btn-video:active { transform: scale(0.92); }
-
-    /* ── Expandable instructions ── */
-    .card-instructions {
-      display: none;
-      padding: 0 14px 14px;
-      border-top: 1px solid var(--border);
-    }
+    /* INSTRUCTIONS */
+    .card-instructions { display: none; padding: 0 13px 13px; border-top: 1px solid var(--border); }
     .card-instructions.open { display: block; }
-    .instructions-body { padding-top: 12px; }
-    .instructions-body h4 { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-    .instructions-body ol { padding-left: 16px; }
-    .instructions-body li { font-size: 13px; color: #B0BDD4; line-height: 1.7; margin-bottom: 2px; }
-    .instructions-body .tip {
-      margin-top: 10px;
-      padding: 8px 10px;
-      background: color-mix(in srgb, var(--kb) 10%, transparent);
-      border-left: 3px solid var(--kb);
-      border-radius: 0 6px 6px 0;
-      font-size: 12px;
-      color: #D4AA60;
-    }
+    .instructions-body { padding-top: 10px; }
+    .instructions-body h4 { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; }
+    .instructions-body ol { padding-left: 15px; }
+    .instructions-body li { font-size: 12px; color: #B0BDD4; line-height: 1.7; margin-bottom: 1px; }
+    .instructions-body .tip { margin-top: 8px; padding: 7px 10px; background: color-mix(in srgb,var(--kb) 10%,transparent); border-left: 3px solid var(--kb); border-radius: 0 6px 6px 0; font-size: 12px; color: #D4AA60; }
 
-    /* ── Log panel (expandable) ── */
-    .log-section {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      margin-bottom: 8px;
-      overflow: hidden;
-    }
-    .log-toggle {
-      width: 100%;
-      padding: 14px;
-      background: none;
-      border: none;
-      color: var(--white);
-      font-family: var(--font);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      text-align: left;
-    }
-    .log-toggle span { font-size: 18px; transition: transform 0.2s; }
-    .log-toggle.open span { transform: rotate(180deg); }
-    .log-body { display: none; padding: 0 14px 14px; }
+    /* LOG PANEL */
+    .log-section { border-top: 1px solid var(--border); }
+    .log-toggle { width: 100%; padding: 12px 13px; background: none; border: none; color: var(--white); font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .log-toggle span.arr { font-size: 16px; transition: transform 0.2s; }
+    .log-toggle.open span.arr { transform: rotate(180deg); }
+    .log-body { display: none; padding: 0 13px 13px; }
     .log-body.open { display: block; }
-
-    .log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
     .log-field label { display: block; font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-    .log-field input {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
-      color: var(--white);
-      font-family: var(--mono);
-      font-size: 13px;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    .log-field input:focus { border-color: var(--accent); }
-    .log-field.full { grid-column: 1 / -1; }
-    .log-field textarea {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
-      color: var(--white);
-      font-family: var(--font);
-      font-size: 13px;
-      outline: none;
-      resize: vertical;
-      min-height: 60px;
-      transition: border-color 0.15s;
-    }
-    .log-field textarea:focus { border-color: var(--accent); }
-    .btn-save {
-      width: 100%;
-      padding: 10px;
-      background: var(--accent);
-      border: none;
-      border-radius: 8px;
-      color: #000;
-      font-family: var(--font);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
+    .log-field input, .log-field textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--white); font-family: var(--mono); font-size: 12px; outline: none; transition: border-color 0.15s; }
+    .log-field input:focus, .log-field textarea:focus { border-color: var(--accent); }
+    .log-field.full { grid-column: 1/-1; }
+    .log-field textarea { resize: vertical; min-height: 55px; font-family: var(--font); font-size: 12px; }
+    .btn-save { width: 100%; padding: 10px; background: var(--accent); border: none; border-radius: 8px; color: #000; font-family: var(--font); font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
     .btn-save:active { opacity: 0.8; }
-    .save-status { font-size: 12px; color: var(--run); text-align: center; margin-top: 6px; min-height: 18px; }
+    .save-status { font-size: 11px; color: var(--run); text-align: center; margin-top: 5px; min-height: 16px; }
 
-    /* ── Video Modal ── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.85);
-      z-index: 999;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+    /* VIDEO MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 999; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 500px;
-      overflow: hidden;
-    }
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-    }
-    .modal-header h3 { font-size: 15px; font-weight: 700; }
-    .modal-close {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 500px; overflow: hidden; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 15px; border-bottom: 1px solid var(--border); }
+    .modal-header h3 { font-size: 14px; font-weight: 700; }
+    .modal-close { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .modal-video { position: relative; padding-top: 56.25%; }
     .modal-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
 
-    /* ── History tab ── */
-    .history-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
-    .history-week {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-    .history-week-header {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    /* FOOD PAGE */
+    .meal-section { margin-bottom: 16px; }
+    .meal-section h3 { font-size: 13px; font-weight: 700; color: var(--food); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .food-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .food-btn { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; text-align: left; transition: all 0.15s; }
+    .food-btn:active { border-color: var(--food); background: color-mix(in srgb,var(--food) 10%,transparent); }
+    .food-btn.selected { border-color: var(--food); background: color-mix(in srgb,var(--food) 12%,transparent); }
+    .food-btn .food-name { font-size: 13px; font-weight: 600; color: var(--white); }
+    .food-btn .food-cals { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
+    .food-btn .food-emoji { font-size: 18px; margin-bottom: 4px; display: block; }
+
+    .food-log-list { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .food-log-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 13px; border-bottom: 1px solid var(--border); }
+    .food-log-item:last-child { border-bottom: none; }
+    .food-log-name { font-size: 13px; font-weight: 600; }
+    .food-log-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .food-log-cals { font-family: var(--mono); font-size: 12px; color: var(--food); }
+    .food-log-del { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px; }
+
+    .calorie-bar-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+    .calorie-bar-wrap h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .cal-numbers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .cal-num { text-align: center; }
+    .cal-num .val { font-family: var(--mono); font-size: 18px; font-weight: 700; }
+    .cal-num .lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .cal-track { height: 6px; background: var(--border); border-radius: 6px; overflow: hidden; }
+    .cal-fill { height: 100%; border-radius: 6px; transition: width 0.4s; }
+
+    /* DASHBOARD */
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .dash-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .dash-card.full { grid-column: 1/-1; }
+    .dash-card h4 { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+    .dash-val { font-family: var(--mono); font-size: 26px; font-weight: 700; }
+    .dash-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .dash-unit { font-size: 13px; font-weight: 400; color: var(--muted); }
+
+    /* RINGS */
+    .rings-row { display: flex; justify-content: space-around; align-items: center; padding: 8px 0; }
+    .ring-wrap { text-align: center; }
+    .ring-wrap svg { display: block; margin: 0 auto 4px; }
+    .ring-label { font-size: 10px; color: var(--muted); }
+    .ring-val { font-size: 12px; font-weight: 700; font-family: var(--mono); }
+
+    /* METRIC INPUT */
+    .metric-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .metric-row label { font-size: 12px; color: var(--muted); width: 90px; flex-shrink: 0; }
+    .metric-row input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; color: var(--white); font-family: var(--mono); font-size: 13px; outline: none; }
+    .metric-row input:focus { border-color: var(--dash); }
+    .metric-row .unit { font-size: 12px; color: var(--muted); width: 30px; }
+
+    /* WATER */
+    .water-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .water-btn { padding: 7px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--white); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .water-btn:active { background: color-mix(in srgb,var(--bike) 20%,transparent); border-color: var(--bike); }
+
+    /* HISTORY */
+    .history-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
+    .history-week { background: var(--card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+    .history-week-header { padding: 11px 13px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .history-week-header h4 { font-size: 13px; font-weight: 700; }
     .history-week-header span { font-family: var(--mono); font-size: 11px; color: var(--run); }
-    .history-entry {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
+    .history-entry { padding: 10px 13px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
     .history-entry:last-child { border-bottom: none; }
     .history-entry-name { font-size: 13px; font-weight: 600; }
-    .history-entry-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .history-entry-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
     .history-entry-stats { font-family: var(--mono); font-size: 11px; color: var(--run); text-align: right; }
 
-    /* ── Bottom nav ── */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      display: flex;
-      padding: 8px 0 env(safe-area-inset-bottom, 8px);
-      z-index: 100;
-    }
-    .nav-btn {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      padding: 8px 4px;
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-family: var(--font);
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: color 0.15s;
-      letter-spacing: 0.5px;
-    }
-    .nav-btn .nav-icon { font-size: 20px; }
-    .nav-btn.active { color: var(--run); }
-
-    .page { display: none; padding-bottom: 80px; }
-    .page.active { display: block; }
-
-    /* ── Config page ── */
-    .config-section { padding: 16px; }
-    .config-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
+    /* SETTINGS */
+    .config-section { padding: 14px 16px; }
+    .config-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 12px; }
     .config-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
     .config-field { margin-bottom: 10px; }
-    .config-field label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-    .config-field input {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      color: var(--white);
-      font-family: var(--mono);
-      font-size: 12px;
-      outline: none;
-    }
+    .config-field label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .config-field input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--white); font-family: var(--mono); font-size: 12px; outline: none; }
     .config-field input:focus { border-color: var(--run); }
-    .btn-config-save {
-      width: 100%;
-      padding: 12px;
-      background: var(--run);
-      border: none;
-      border-radius: 10px;
-      color: #000;
-      font-family: var(--font);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 4px;
-    }
-    .config-status { font-size: 12px; color: var(--run); text-align: center; margin-top: 8px; min-height: 18px; }
-    .config-info {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
+    .btn-config-save { width: 100%; padding: 11px; background: var(--run); border: none; border-radius: 10px; color: #000; font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer; }
+    .config-status { font-size: 12px; color: var(--run); text-align: center; margin-top: 7px; min-height: 17px; }
+    .config-info { font-size: 12px; color: var(--muted); line-height: 1.6; }
     .config-info a { color: var(--bike); }
-    .config-info code {
-      background: var(--surface);
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--kb);
-    }
+    .config-info code { background: var(--surface); padding: 1px 5px; border-radius: 4px; font-family: var(--mono); font-size: 11px; color: var(--kb); }
+    .db-status { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; padding: 3px 8px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); margin-top: 8px; }
+    .db-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+    .db-status.connected { color: var(--run); border-color: color-mix(in srgb,var(--run) 40%,transparent); }
+    .db-status.connected .db-dot { background: var(--run); }
 
-    /* ── Toast ── */
-    .toast {
-      position: fixed;
-      bottom: 90px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--run);
-      color: #000;
-      font-weight: 700;
-      font-size: 13px;
-      padding: 10px 20px;
-      border-radius: 20px;
-      opacity: 0;
-      transition: all 0.3s;
-      z-index: 200;
-      white-space: nowrap;
-    }
+    /* BOTTOM NAV */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding: 6px 0 env(safe-area-inset-bottom,6px); z-index: 100; }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; background: none; border: none; color: var(--muted); font-family: var(--font); font-size: 9px; font-weight: 600; cursor: pointer; transition: color 0.15s; letter-spacing: 0.5px; }
+    .nav-btn .nav-icon { font-size: 18px; }
+    .nav-btn.active { color: var(--run); }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--run); color: #000; font-weight: 700; font-size: 12px; padding: 9px 18px; border-radius: 20px; opacity: 0; transition: all 0.3s; z-index: 200; white-space: nowrap; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ── Supabase status ── */
-    .db-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      margin-top: 8px;
-    }
-    .db-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
-    .db-status.connected { color: var(--run); border-color: color-mix(in srgb, var(--run) 40%, transparent); }
-    .db-status.connected .db-dot { background: var(--run); }
+    /* CUSTOM FOOD MODAL */
+    .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 998; align-items: flex-end; justify-content: center; }
+    .custom-modal.open { display: flex; }
+    .custom-modal-inner { background: var(--card); border: 1px solid var(--border); border-radius: 20px 20px 0 0; width: 100%; max-width: 600px; padding: 20px 16px 32px; }
+    .custom-modal-inner h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+    .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .chip { padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--white); font-size: 12px; cursor: pointer; transition: all 0.15s; }
+    .chip.sel { background: color-mix(in srgb,var(--food) 20%,transparent); border-color: var(--food); color: var(--food); }
   </style>
 </head>
 <body>
 
-<!-- ── Video Modal ── -->
+<!-- Video Modal -->
 <div class="modal-overlay" id="videoModal">
   <div class="modal">
-    <div class="modal-header">
-      <h3 id="modalTitle">Exercise Video</h3>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-header"><h3 id="modalTitle">Exercise Video</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-video"><iframe id="modalIframe" src="" allowfullscreen></iframe></div>
+  </div>
+</div>
+
+<!-- Custom Food Modal -->
+<div class="custom-modal" id="customFoodModal">
+  <div class="custom-modal-inner">
+    <h3>➕ Log Custom Food</h3>
+    <div class="config-field"><label>Meal Type</label>
+      <div class="chip-row">
+        <span class="chip sel" onclick="selectChip(this,'mealType','breakfast')">🌅 Breakfast</span>
+        <span class="chip" onclick="selectChip(this,'mealType','lunch')">☀️ Lunch</span>
+        <span class="chip" onclick="selectChip(this,'mealType','dinner')">🌙 Dinner</span>
+        <span class="chip" onclick="selectChip(this,'mealType','snack')">🍎 Snack</span>
+      </div>
     </div>
-    <div class="modal-video">
-      <iframe id="modalIframe" src="" allowfullscreen></iframe>
+    <div class="config-field"><label>Food Name</label><input type="text" id="customFoodName" placeholder="e.g. Momo, Dal Bhat..." /></div>
+    <div class="log-grid">
+      <div class="log-field"><label>Calories</label><input type="number" id="customFoodCal" placeholder="450" /></div>
+      <div class="log-field"><label>Protein (g)</label><input type="number" id="customFoodPro" placeholder="20" /></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button style="flex:1;padding:11px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--white);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer" onclick="closeCustomFood()">Cancel</button>
+      <button style="flex:2;padding:11px;background:var(--food);border:none;border-radius:10px;color:#000;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer" onclick="addCustomFood()">Add Food</button>
     </div>
   </div>
 </div>
 
-<!-- ── Toast ── -->
 <div class="toast" id="toast"></div>
 
-<!-- ── Header ── -->
+<!-- HEADER -->
 <div class="header">
   <div class="header-top">
-    <h1>🏃 <span>Fit</span>Tracker</h1>
-    <div class="week-badge" id="weekBadge">Week of —</div>
+    <h1>🏃 <span>Ashesh</span> Health</h1>
+    <div class="date-badge" id="dateBadge"></div>
   </div>
-  <div class="progress-wrap" id="progressWrap" style="display:none">
-    <div class="progress-label">
-      <span>This week</span>
-      <strong id="progressText">0 / 0 done</strong>
-    </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Today's workout</span><strong id="progressText">0 / 0 done</strong></div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
   </div>
 </div>
 
-<!-- ── Pages ── -->
-
-<!-- TODAY / TRACKER PAGE -->
+<!-- PAGES -->
+<!-- TODAY -->
 <div class="page active" id="page-today">
-  <!-- Day tabs -->
-  <div class="tabs-wrap">
-    <div class="tabs" id="dayTabs"></div>
-  </div>
-
-  <!-- Day content -->
+  <div class="tabs-wrap"><div class="tabs" id="dayTabs"></div></div>
   <div class="main" id="dayContent"></div>
 </div>
 
-<!-- HISTORY PAGE -->
-<div class="page" id="page-history">
+<!-- FOOD -->
+<div class="page" id="page-food">
   <div class="main">
-    <div class="section-label" style="margin-top:16px">Past Sessions</div>
-    <div id="historyList"><div class="history-empty">No sessions logged yet.<br>Complete activities to see your history here.</div></div>
+    <div class="calorie-bar-wrap" id="calSummary">
+      <h3>Today's Nutrition</h3>
+      <div class="cal-numbers">
+        <div class="cal-num"><div class="val" id="calEaten" style="color:var(--food)">0</div><div class="lbl">eaten</div></div>
+        <div class="cal-num"><div class="val" id="calBurned" style="color:var(--run)">0</div><div class="lbl">burned</div></div>
+        <div class="cal-num"><div class="val" id="calNet">0</div><div class="lbl">net</div></div>
+      </div>
+      <div class="cal-track"><div class="cal-fill" id="calFill" style="width:0%;background:var(--food)"></div></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:5px" id="calGoalLine">Goal: 2000 kcal</div>
+    </div>
+
+    <div class="section-label">Today's Log</div>
+    <div id="foodLogList"><div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No food logged yet today</div></div>
+
+    <div class="section-label">🍛 Nepali Meals</div>
+    <div class="food-grid" id="nepaliGrid"></div>
+
+    <div class="section-label">🌏 Everyday Foods</div>
+    <div class="food-grid" id="everydayGrid"></div>
+
+    <div class="section-label">☕ Drinks & Snacks</div>
+    <div class="food-grid" id="drinksGrid"></div>
+
+    <button style="width:100%;margin-top:12px;padding:12px;background:var(--surface);border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer" onclick="openCustomFood()">➕ Add Custom Food</button>
   </div>
 </div>
 
-<!-- SETTINGS PAGE -->
+<!-- DASHBOARD -->
+<div class="page" id="page-dash">
+  <div class="main">
+    <div class="section-label" style="margin-top:4px">Today's Rings</div>
+    <div class="dash-card full" style="margin-bottom:10px">
+      <div class="rings-row" id="ringsRow"></div>
+    </div>
+
+    <div class="dash-grid" id="dashGrid"></div>
+
+    <div class="section-label">Log Today's Metrics</div>
+    <div class="dash-card full">
+      <div class="metric-row"><label>⚖️ Weight</label><input type="number" step="0.1" id="metWeight" placeholder="75.0" /><span class="unit">kg</span></div>
+      <div class="metric-row"><label>😴 Sleep</label><input type="number" step="0.5" id="metSleep" placeholder="7.5" /><span class="unit">hrs</span></div>
+      <div class="metric-row"><label>💧 Water</label><input type="number" id="metWater" placeholder="2000" /><span class="unit">ml</span></div>
+      <div class="water-btns">
+        <button class="water-btn" onclick="addWater(250)">+250ml</button>
+        <button class="water-btn" onclick="addWater(500)">+500ml</button>
+        <button class="water-btn" onclick="addWater(750)">+750ml</button>
+        <button class="water-btn" onclick="addWater(1000)">+1L</button>
+      </div>
+      <button class="btn-save" style="margin-top:12px;background:var(--dash);color:#000" onclick="saveMetrics()">Save Today's Metrics</button>
+      <div class="save-status" id="metStatus"></div>
+    </div>
+
+    <div class="section-label">Weight Trend</div>
+    <div class="dash-card full">
+      <canvas id="weightChart" height="120"></canvas>
+      <div id="noWeightData" style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Log your weight daily to see the trend</div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="page" id="page-history">
+  <div class="main">
+    <div class="section-label" style="margin-top:4px">Past Sessions</div>
+    <div id="historyList"><div class="history-empty">No sessions logged yet.</div></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
 <div class="page" id="page-settings">
   <div class="config-section">
-    <div class="section-label" style="margin-top:16px">Database Setup</div>
+    <div class="section-label" style="margin-top:4px">Database</div>
     <div class="config-card">
       <h3>🗄 Supabase Connection</h3>
-      <div class="config-info" style="margin-bottom:12px">
-        Connect your Supabase project to save workout logs permanently.<br><br>
-        1. Go to <a href="https://supabase.com" target="_blank">supabase.com</a> → your project<br>
-        2. Settings → API → copy <code>URL</code> and <code>anon key</code><br>
-        3. Run this SQL in the SQL editor:
-        <pre style="background:var(--surface);padding:10px;border-radius:8px;margin-top:8px;font-size:11px;color:var(--kb);overflow-x:auto;line-height:1.5">CREATE TABLE fitness_logs (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  created_at timestamptz DEFAULT now(),
-  week_start date NOT NULL,
-  day text NOT NULL,
-  activity text NOT NULL,
-  done boolean DEFAULT false,
-  duration_min int,
-  distance_km numeric(5,2),
-  avg_hr int,
-  calories int,
-  notes text
-);</pre>
-      </div>
-      <div class="config-field">
-        <label>Supabase URL</label>
-        <input type="text" id="cfgUrl" placeholder="https://xxxx.supabase.co" />
-      </div>
-      <div class="config-field">
-        <label>Anon Key</label>
-        <input type="text" id="cfgKey" placeholder="eyJ..." />
-      </div>
+      <div class="config-field"><label>Project URL</label><input type="text" id="cfgUrl" placeholder="https://xxxx.supabase.co" /></div>
+      <div class="config-field"><label>Anon Key</label><input type="text" id="cfgKey" placeholder="eyJ..." /></div>
       <button class="btn-config-save" onclick="saveConfig()">Save & Test Connection</button>
       <div class="config-status" id="cfgStatus"></div>
       <div id="dbStatusBadge"></div>
     </div>
-
+    <div class="config-card">
+      <h3>🎯 Daily Calorie Goal</h3>
+      <div class="config-field"><label>Goal (kcal)</label><input type="number" id="cfgCalGoal" placeholder="2000" /></div>
+      <button class="btn-config-save" style="background:var(--food)" onclick="saveCalGoal()">Save Goal</button>
+    </div>
     <div class="config-card">
       <h3>ℹ️ About</h3>
-      <p class="config-info">
-        Built for Ashesh's fitness routine: Run · E-Bike · Kettlebell · Rest.<br><br>
-        <strong style="color:var(--white)">Stack:</strong> HTML + Supabase (PostgreSQL)<br>
-        <strong style="color:var(--white)">Host free on:</strong> <a href="https://vercel.com" target="_blank">Vercel</a>, <a href="https://pages.github.com" target="_blank">GitHub Pages</a>, or <a href="https://netlify.com" target="_blank">Netlify</a><br><br>
-        <strong style="color:var(--white)">Kettlebell guide:</strong><br>
-        5 kg → Curls, Hammer Curl, Pullover, Overhead Extension<br>
-        8 kg → Row, Floor Press
-      </p>
+      <p class="config-info">Built for Ashesh · Run · E-Bike · Kettlebell · Food · Metrics<br><br>
+      <strong style="color:var(--white)">5 kg KB →</strong> Curls, Hammer, Pullover, Extension<br>
+      <strong style="color:var(--white)">8 kg KB →</strong> Row, Floor Press<br><br>
+      <strong style="color:var(--white)">URL:</strong> <a href="https://fitness-tracker-pi-puce.vercel.app" target="_blank">fitness-tracker-pi-puce.vercel.app</a></p>
     </div>
   </div>
 </div>
 
-<!-- ── Bottom Nav ── -->
+<!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <button class="nav-btn active" onclick="showPage('today', this)">
-    <span class="nav-icon">📋</span>TODAY
-  </button>
-  <button class="nav-btn" onclick="showPage('history', this)">
-    <span class="nav-icon">📈</span>HISTORY
-  </button>
-  <button class="nav-btn" onclick="showPage('settings', this)">
-    <span class="nav-icon">⚙️</span>SETTINGS
-  </button>
+  <button class="nav-btn active" onclick="showPage('today',this)"><span class="nav-icon">📋</span>TODAY</button>
+  <button class="nav-btn" onclick="showPage('food',this)"><span class="nav-icon">🍛</span>FOOD</button>
+  <button class="nav-btn" onclick="showPage('dash',this)"><span class="nav-icon">📊</span>DASH</button>
+  <button class="nav-btn" onclick="showPage('history',this)"><span class="nav-icon">📈</span>HISTORY</button>
+  <button class="nav-btn" onclick="showPage('settings',this)"><span class="nav-icon">⚙️</span>SETTINGS</button>
 </div>
 
 <script>
-// ─────────────────────────────────────────────
-//  DATA
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+// WORKOUT DATA
+// ═══════════════════════════════════════════════
 const DAYS = [
-  {
-    id: 'mon', label: 'MON', name: 'Monday', theme: 'Run Day + Kettlebell',
-    accent: '#22C55E', type: 'run',
-    hint: ['3 runs/week builds your base', '~37 min · ~4.7 km target'],
-    activities: [
-      { id: 'mon_run', name: '🏃 Outdoor Run', meta: '~37 min · ~4.7 km', type: 'cardio', hasLog: true,
-        instructions: ['Warm up with a 3-min walk before starting', 'Aim for a comfortable pace — you should be able to hold a conversation', 'Target ~8 min/km average (your current pace)', 'Keep heart rate under 165 bpm for most of the run', 'Cool down with a 3-min walk at the end'],
-        tip: 'If you hit 175 bpm like last run, slow down slightly — aerobic zone is 140–165 bpm' },
-      { id: 'mon_curl', name: '💪 KB Curl', meta: '3 × 15 reps · 5 kg', type: 'kb',
-        video: 'Z8KoDsB2fxM', videoTitle: 'Kettlebell Curl',
-        instructions: ['Stand feet shoulder-width apart, KB in one hand', 'Keep elbow pinned to your side — don\'t let it swing forward', 'Curl the KB up slowly (2 sec up, 2 sec down)', 'Squeeze your bicep at the top', 'Lower fully and repeat'],
-        tip: 'Avoid swinging your body. If you can\'t keep form, take 30 sec rest between sets.' },
-      { id: 'mon_hammer', name: '💪 Hammer Curl', meta: '3 × 15 reps · 5 kg', type: 'kb',
-        video: 'V7lPFOEKyxs', videoTitle: 'Hammer Curl',
-        instructions: ['Hold KB with thumb facing up (neutral grip)', 'Keep elbow locked to side', 'Curl up in a controlled motion', 'Don\'t rotate your wrist — thumb stays up the whole time', 'Lower slowly and repeat'],
-        tip: 'Hammer curls work the brachialis (outer bicep) and forearms — great for arm thickness.' },
-      { id: 'mon_row', name: '💪 KB Row', meta: '3 × 15 reps · 8 kg', type: 'kb',
-        video: 'IyQAMOV0WAc', videoTitle: 'Kettlebell Row',
-        instructions: ['Hinge at hips, back flat, one hand on wall or knee for support', 'KB hanging in opposite hand, elbow close to body', 'Pull KB to hip — not shoulder — leading with your elbow', 'Squeeze your back at the top', 'Lower with control'],
-        tip: 'Focus on pulling with your elbow, not your hand. This isolates the back properly.' },
-    ]
-  },
-  {
-    id: 'tue', label: 'TUE', name: 'Tuesday', theme: 'E-Bike + Kettlebell',
-    accent: '#3B82F6', type: 'bike',
-    hint: ['Active recovery day', '~55 min ride · arm work on bike'],
-    activities: [
-      { id: 'tue_bike', name: '🚵 E-Bike Ride', meta: '~55 min · ~12 km · low assist', type: 'bike', hasLog: true,
-        instructions: ['Set e-bike to lowest assist level', 'Aim for a comfortable pace — this is recovery, not hard effort', 'Target heart rate: 110–130 bpm (lower than run days)', 'Find a safe flat section to do your arm exercises mid-ride'],
-        tip: 'This ride should feel easy. You\'re letting your legs recover from Monday\'s run.' },
-      { id: 'tue_raises', name: '🙌 Arm Raises on Bike', meta: '50 reps · bodyweight', type: 'bike',
-        instructions: ['Find a safe, flat section of road with no traffic', 'Let go of handlebars (safely!) and raise both arms forward to shoulder height', 'Lower and repeat — engage your core to keep balanced', 'Do in sets of 10 if 50 consecutive feels unstable'],
-        tip: 'The unstable surface forces your core to work harder than standing raises.' },
-      { id: 'tue_lateral', name: '🙌 Lateral Holds on Bike', meta: 'Hold 3×20 sec · bodyweight', type: 'bike',
-        instructions: ['On a safe flat section, extend both arms out to the sides (T-shape)', 'Hold for 20 seconds', 'Rest, then repeat 3 times', 'Keep your core tight and sit up straight'],
-        tip: 'These hit your lateral deltoids — same muscles as side raises in a gym.' },
-      { id: 'tue_press', name: '💪 KB Floor Press', meta: '3 × 15 reps · 8 kg', type: 'kb',
-        video: 'pNgpSubqYMQ', videoTitle: 'KB Floor Press',
-        instructions: ['Lie on your back, knees bent, feet flat on floor', 'Hold KB in one hand at chest height, elbow at 45° to body', 'Press up until arm is fully extended', 'Lower slowly — elbow touches floor between reps', 'Complete all reps then switch arms'],
-        tip: 'Floor limits your range of motion safely. Keep the 8 kg — this is your chest day.' },
-      { id: 'tue_pullover', name: '💪 KB Pullover', meta: '3 × 12 reps · 5 kg', type: 'kb',
-        video: 'f2q303a-6c0', videoTitle: 'KB Pullover',
-        instructions: ['Lie on back, hold KB with both hands above your chest', 'Slowly lower KB back over your head, arms slightly bent', 'Feel the stretch in your chest and lats', 'Pull KB back to starting position using your chest and lats', 'Keep your lower back on the floor the whole time'],
-        tip: 'This stretches the chest and lats simultaneously — great for posture improvement.' },
-      { id: 'tue_plank', name: '💪 Plank Hold', meta: '3 × 45 sec · bodyweight', type: 'kb',
-        instructions: ['Elbows on floor, shoulders directly above elbows', 'Body in a straight line from head to heels', 'Squeeze your glutes and tuck your pelvis slightly', 'Breathe steadily — don\'t hold your breath', 'Rest 45 sec between sets'],
-        tip: 'If 45 sec is too hard, start with 20 sec and build up over weeks.' },
-    ]
-  },
-  {
-    id: 'wed', label: 'WED', name: 'Wednesday', theme: 'Run Day + Kettlebell',
-    accent: '#22C55E', type: 'run',
-    hint: ['Second run of the week', 'Focus on consistent pace'],
-    activities: [
-      { id: 'wed_run', name: '🏃 Outdoor Run', meta: '~37 min · ~4.7 km', type: 'cardio', hasLog: true,
-        instructions: ['Same route and effort as Monday', 'Try to keep heart rate under 160 bpm today — Wednesday runs should feel easier than Monday', 'Focus on cadence: aim for 165+ steps/min', 'If legs feel heavy, slow down — don\'t push through fatigue'],
-        tip: 'Wednesday runs build your aerobic base. Consistency matters more than pace right now.' },
-      { id: 'wed_ext', name: '💪 Overhead Extension', meta: '3 × 15 reps · 5 kg', type: 'kb',
-        video: 'B7oBfoYRINE', videoTitle: 'KB Overhead Extension',
-        instructions: ['Stand or sit, hold KB with both hands behind your head', 'Upper arms stay close to ears — only forearms move', 'Extend arms up until fully straight', 'Lower slowly behind your head', 'Don\'t arch your lower back — brace your core'],
-        tip: 'This is the best isolation exercise for triceps. Control the descent.' },
-      { id: 'wed_curl', name: '💪 KB Curl', meta: '3 × 15 reps · 5 kg', type: 'kb',
-        video: 'Z8KoDsB2fxM', videoTitle: 'Kettlebell Curl',
-        instructions: ['Same as Monday', 'Keep elbow pinned to side', 'Curl slowly — 2 sec up, 2 sec down', 'Squeeze at top, full extension at bottom'],
-        tip: 'You\'re doing curls on Monday and Wednesday to build frequency. Key for bicep growth.' },
-      { id: 'wed_row', name: '💪 KB Row', meta: '3 × 15 reps · 8 kg', type: 'kb',
-        video: 'IyQAMOV0WAc', videoTitle: 'Kettlebell Row',
-        instructions: ['Same as Monday', 'Hinge at hips, back flat', 'Pull to hip, squeeze back at top', 'Lower with control'],
-        tip: 'Notice if Wednesday rows feel easier than Monday. That\'s progress.' },
-    ]
-  },
-  {
-    id: 'thu', label: 'THU', name: 'Thursday', theme: 'Full Strength Day',
-    accent: '#F59E0B', type: 'kb',
-    hint: ['Dedicated kettlebell day', 'Full body — no running today'],
-    activities: [
-      { id: 'thu_curl', name: '💪 KB Curl', meta: '3 × 15 reps · 5 kg', type: 'kb', video: 'Z8KoDsB2fxM', videoTitle: 'Kettlebell Curl',
-        instructions: ['Stand feet shoulder-width apart', 'Elbow pinned to side, curl slowly', '2 sec up, 2 sec down', 'Full range of motion every rep'] },
-      { id: 'thu_hammer', name: '💪 Hammer Curl', meta: '3 × 15 reps · 5 kg', type: 'kb', video: 'V7lPFOEKyxs', videoTitle: 'Hammer Curl',
-        instructions: ['Neutral grip (thumb up)', 'Elbow stays locked to side', 'Don\'t rotate wrist', 'Lower fully between reps'] },
-      { id: 'thu_press', name: '💪 KB Floor Press', meta: '3 × 15 reps · 8 kg', type: 'kb', video: 'pNgpSubqYMQ', videoTitle: 'KB Floor Press',
-        instructions: ['Lie on back, knees bent', 'Press up from chest, elbow at 45°', 'Elbow touches floor between reps', 'Full extension at top'] },
-      { id: 'thu_pullover', name: '💪 KB Pullover', meta: '3 × 12 reps · 5 kg', type: 'kb', video: 'f2q303a-6c0', videoTitle: 'KB Pullover',
-        instructions: ['Both hands hold KB above chest', 'Lower behind head — feel the stretch', 'Pull back using chest and lats', 'Keep lower back on floor'] },
-      { id: 'thu_ext', name: '💪 Overhead Extension', meta: '3 × 15 reps · 5 kg', type: 'kb', video: 'B7oBfoYRINE', videoTitle: 'KB Overhead Extension',
-        instructions: ['Both hands on KB behind head', 'Upper arms stay by ears', 'Extend fully, lower slowly', 'Core braced throughout'] },
-      { id: 'thu_row', name: '💪 KB Row', meta: '3 × 15 reps · 8 kg', type: 'kb', video: 'IyQAMOV0WAc', videoTitle: 'Kettlebell Row',
-        instructions: ['Hinge at hips, back flat', 'Pull KB to hip, not shoulder', 'Lead with elbow', 'Squeeze back at top'],
-        tip: 'This is your third row of the week. By now it should feel familiar — push the squeeze.' },
-      { id: 'thu_plank', name: '💪 Plank Hold', meta: '3 × 45 sec · bodyweight', type: 'kb',
-        instructions: ['Elbows on floor, body straight', 'Squeeze glutes and core', 'Breathe steadily', '45 sec rest between sets'],
-        tip: 'Thursday plank closes your full body session. Hold good form — don\'t sag your hips.' },
-    ]
-  },
-  {
-    id: 'fri', label: 'FRI', name: 'Friday', theme: 'E-Bike (Active Recovery)',
-    accent: '#3B82F6', type: 'bike',
-    hint: ['Easy legs day', 'Prep for Saturday long run'],
-    activities: [
-      { id: 'fri_bike', name: '🚵 E-Bike Ride', meta: '~55 min · ~12 km · low assist', type: 'bike', hasLog: true,
-        instructions: ['Low assist — let your legs do some work', 'Keep HR under 130 bpm — this is pure recovery', 'Enjoy the ride — no performance goals today', 'Hydrate well — big run tomorrow'],
-        tip: 'Friday is about moving without stressing your body. Save your energy for Saturday.' },
-      { id: 'fri_raises', name: '🙌 Arm Raises on Bike', meta: '50 reps · bodyweight', type: 'bike',
-        instructions: ['Safe flat section, no traffic', 'Raise arms forward to shoulder height', 'Lower and repeat', 'Core tight for balance'] },
-      { id: 'fri_lateral', name: '🙌 Lateral Holds on Bike', meta: 'Hold 3×20 sec · bodyweight', type: 'bike',
-        instructions: ['T-shape arms out to sides', 'Hold 20 seconds', 'Rest and repeat 3 times', 'Sit up straight, core tight'] },
-    ]
-  },
-  {
-    id: 'sat', label: 'SAT', name: 'Saturday', theme: 'Long Run Day',
-    accent: '#EF4444', type: 'run',
-    hint: ['Your longest run of the week', 'Slower pace is the goal'],
-    activities: [
-      { id: 'sat_run', name: '🏃 Long Run', meta: '~55 min · 6–7 km · slow pace', type: 'cardio', hasLog: true,
-        instructions: ['Start slower than your Monday pace — aim for 8:30–9 min/km', 'This run is about time on feet, not speed', 'Heart rate should stay under 155 bpm for most of it', 'Walk if needed — no shame in run/walk intervals', 'Bring water if it\'s warm'],
-        tip: 'The long run builds your aerobic base more than any other workout. Slow is fine — finishing is the goal.' },
-    ]
-  },
-  {
-    id: 'sun', label: 'SUN', name: 'Sunday', theme: 'Full Rest',
-    accent: '#8B5CF6', type: 'rest',
-    hint: ['Rest is when fitness improves', 'No structured exercise today'],
-    activities: [
-      { id: 'sun_rest', name: '😴 Rest & Recovery', meta: 'All day — no exercise', type: 'rest',
-        instructions: ['No structured exercise', 'Light walking is fine if you feel like it', 'Focus on hydration and good sleep tonight', 'Stretch or foam roll if you have tight muscles', 'Prepare mentally for the week ahead'],
-        tip: 'Muscle repair and fitness gains happen during rest. Sunday off is part of the training plan, not skipping it.' },
-    ]
-  },
+  { id:'mon', label:'MON', name:'Monday', theme:'Run Day + Kettlebell', accent:'#22C55E', type:'run', hint:['3 runs/week','~37 min · ~4.7 km'],
+    activities:[
+      { id:'mon_run', name:'🏃 Outdoor Run', meta:'~37 min · ~4.7 km', type:'cardio', hasLog:true, instructions:['Warm up with a 3-min walk','Aim for conversational pace — ~8 min/km','Keep HR under 165 bpm','Cool down with a 3-min walk'], tip:'If HR hits 175 like last run, slow down slightly' },
+      { id:'mon_curl', name:'💪 KB Curl', meta:'3×15 · 5 kg', type:'kb', video:'Z8KoDsB2fxM', videoTitle:'Kettlebell Curl', instructions:['Elbow pinned to side','2 sec up, 2 sec down','Full range every rep'], tip:'Avoid swinging your body' },
+      { id:'mon_hammer', name:'💪 Hammer Curl', meta:'3×15 · 5 kg', type:'kb', video:'V7lPFOEKyxs', videoTitle:'Hammer Curl', instructions:['Neutral grip — thumb stays up','Elbow locked to side','Lower fully between reps'] },
+      { id:'mon_row', name:'💪 KB Row', meta:'3×15 · 8 kg', type:'kb', video:'IyQAMOV0WAc', videoTitle:'Kettlebell Row', instructions:['Hinge at hips, back flat','Pull KB to hip, not shoulder','Lead with elbow, squeeze at top'] },
+    ]},
+  { id:'tue', label:'TUE', name:'Tuesday', theme:'E-Bike + Kettlebell', accent:'#3B82F6', type:'bike', hint:['Active recovery','~55 min · arm work on bike'],
+    activities:[
+      { id:'tue_bike', name:'🚵 E-Bike Ride', meta:'~55 min · ~12 km · low assist', type:'bike', hasLog:true, instructions:['Low assist setting','Target HR: 110–130 bpm','Find flat section for arm work'], tip:'Easy pace — legs recovering from Monday' },
+      { id:'tue_raises', name:'🙌 Arm Raises on Bike', meta:'50 reps · bodyweight', type:'bike', instructions:['Safe flat road, no traffic','Both arms forward to shoulder height','Core tight for balance'] },
+      { id:'tue_lateral', name:'🙌 Lateral Holds', meta:'3×20 sec · bodyweight', type:'bike', instructions:['T-shape arms out to sides','Hold 20 sec, rest, repeat 3x','Sit up straight, core tight'] },
+      { id:'tue_press', name:'💪 KB Floor Press', meta:'3×15 · 8 kg', type:'kb', video:'pNgpSubqYMQ', videoTitle:'KB Floor Press', instructions:['Lie on back, knees bent','Press up, elbow at 45°','Elbow touches floor between reps'] },
+      { id:'tue_pullover', name:'💪 KB Pullover', meta:'3×12 · 5 kg', type:'kb', video:'f2q303a-6c0', videoTitle:'KB Pullover', instructions:['Both hands on KB above chest','Lower behind head, feel stretch','Pull back using chest and lats'] },
+      { id:'tue_plank', name:'💪 Plank Hold', meta:'3×45 sec · bodyweight', type:'kb', instructions:['Elbows on floor, body straight','Squeeze glutes and core','Breathe steadily'], tip:'Start with 20 sec if 45 is too hard' },
+    ]},
+  { id:'wed', label:'WED', name:'Wednesday', theme:'Run Day + Kettlebell', accent:'#22C55E', type:'run', hint:['Second run','Focus on consistent pace'],
+    activities:[
+      { id:'wed_run', name:'🏃 Outdoor Run', meta:'~37 min · ~4.7 km', type:'cardio', hasLog:true, instructions:['Same effort as Monday','Keep HR under 160 today','Focus on cadence: 165+ steps/min'] },
+      { id:'wed_ext', name:'💪 Overhead Extension', meta:'3×15 · 5 kg', type:'kb', video:'B7oBfoYRINE', videoTitle:'KB Overhead Extension', instructions:['Both hands on KB behind head','Upper arms stay by ears','Extend fully, lower slowly'] },
+      { id:'wed_curl', name:'💪 KB Curl', meta:'3×15 · 5 kg', type:'kb', video:'Z8KoDsB2fxM', videoTitle:'Kettlebell Curl', instructions:['Elbow pinned to side','2 sec up, 2 sec down'] },
+      { id:'wed_row', name:'💪 KB Row', meta:'3×15 · 8 kg', type:'kb', video:'IyQAMOV0WAc', videoTitle:'Kettlebell Row', instructions:['Hinge at hips, back flat','Pull to hip, squeeze at top'] },
+    ]},
+  { id:'thu', label:'THU', name:'Thursday', theme:'Full Strength Day', accent:'#F59E0B', type:'kb', hint:['Full body KB session','No running today'],
+    activities:[
+      { id:'thu_curl', name:'💪 KB Curl', meta:'3×15 · 5 kg', type:'kb', video:'Z8KoDsB2fxM', videoTitle:'Kettlebell Curl', instructions:['Elbow pinned to side','2 sec up, 2 sec down'] },
+      { id:'thu_hammer', name:'💪 Hammer Curl', meta:'3×15 · 5 kg', type:'kb', video:'V7lPFOEKyxs', videoTitle:'Hammer Curl', instructions:['Neutral grip — thumb up','Lower fully between reps'] },
+      { id:'thu_press', name:'💪 KB Floor Press', meta:'3×15 · 8 kg', type:'kb', video:'pNgpSubqYMQ', videoTitle:'KB Floor Press', instructions:['Lie on back, elbow at 45°','Elbow touches floor between reps'] },
+      { id:'thu_pullover', name:'💪 KB Pullover', meta:'3×12 · 5 kg', type:'kb', video:'f2q303a-6c0', videoTitle:'KB Pullover', instructions:['Lower behind head','Pull back with chest and lats'] },
+      { id:'thu_ext', name:'💪 Overhead Extension', meta:'3×15 · 5 kg', type:'kb', video:'B7oBfoYRINE', videoTitle:'KB Overhead Extension', instructions:['Arms by ears','Extend fully, lower slowly'] },
+      { id:'thu_row', name:'💪 KB Row', meta:'3×15 · 8 kg', type:'kb', video:'IyQAMOV0WAc', videoTitle:'Kettlebell Row', instructions:['Pull to hip, squeeze at top'], tip:'Third row this week — push the squeeze' },
+      { id:'thu_plank', name:'💪 Plank Hold', meta:'3×45 sec · bodyweight', type:'kb', instructions:['Body straight, core tight','Breathe steadily'], tip:'Thursday plank closes your full body session' },
+    ]},
+  { id:'fri', label:'FRI', name:'Friday', theme:'E-Bike (Active Recovery)', accent:'#3B82F6', type:'bike', hint:['Easy legs day','Save energy for Saturday'],
+    activities:[
+      { id:'fri_bike', name:'🚵 E-Bike Ride', meta:'~55 min · ~12 km · low assist', type:'bike', hasLog:true, instructions:['Low assist — keep HR under 130','Hydrate well — big run tomorrow'], tip:'Friday is pure recovery. Save legs for Saturday.' },
+      { id:'fri_raises', name:'🙌 Arm Raises on Bike', meta:'50 reps · bodyweight', type:'bike', instructions:['Safe flat road','Core tight for balance'] },
+      { id:'fri_lateral', name:'🙌 Lateral Holds', meta:'3×20 sec · bodyweight', type:'bike', instructions:['T-shape arms, hold 20 sec','Repeat 3x'] },
+    ]},
+  { id:'sat', label:'SAT', name:'Saturday', theme:'Long Run Day', accent:'#EF4444', type:'run', hint:['Longest run of the week','Slower pace is the goal'],
+    activities:[
+      { id:'sat_run', name:'🏃 Long Run', meta:'~55 min · 6–7 km', type:'cardio', hasLog:true, instructions:['Start at 8:30–9 min/km — slower than usual','Time on feet matters, not speed','HR under 155 bpm most of the run','Walk if needed — no shame'], tip:'Slow is fine — finishing is the goal' },
+    ]},
+  { id:'sun', label:'SUN', name:'Sunday', theme:'Full Rest', accent:'#8B5CF6', type:'rest', hint:['Rest = when you get fitter','No exercise today'],
+    activities:[
+      { id:'sun_rest', name:'😴 Rest & Recovery', meta:'All day', type:'rest', instructions:['No structured exercise','Light walking is fine','Focus on sleep and hydration','Stretch if tight'], tip:'Fitness gains happen during rest — Sunday off is part of the plan' },
+    ]},
 ];
 
-// ─────────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+// FOOD DATABASE
+// ═══════════════════════════════════════════════
+const FOODS = {
+  nepali: [
+    { name:'Dal Bhat (full)', emoji:'🍛', cal:650, protein:22, mealType:'lunch' },
+    { name:'Momo (10 pcs)', emoji:'🥟', cal:380, protein:18, mealType:'lunch' },
+    { name:'Chow Mein', emoji:'🍜', cal:420, protein:14, mealType:'lunch' },
+    { name:'Tarkari + Roti', emoji:'🫓', cal:350, protein:10, mealType:'dinner' },
+    { name:'Sel Roti (2)', emoji:'🍩', cal:280, protein:5, mealType:'snack' },
+    { name:'Achar', emoji:'🌶️', cal:30, protein:1, mealType:'snack' },
+    { name:'Samosa (2)', emoji:'🫔', cal:200, protein:5, mealType:'snack' },
+    { name:'Chicken Curry', emoji:'🍗', cal:320, protein:28, mealType:'dinner' },
+    { name:'Fish Curry', emoji:'🐟', cal:280, protein:30, mealType:'dinner' },
+    { name:'Khichdi', emoji:'🥘', cal:380, protein:12, mealType:'dinner' },
+  ],
+  everyday: [
+    { name:'Eggs (2, scrambled)', emoji:'🍳', cal:180, protein:14, mealType:'breakfast' },
+    { name:'Toast (2 slices)', emoji:'🍞', cal:160, protein:6, mealType:'breakfast' },
+    { name:'Banana', emoji:'🍌', cal:90, protein:1, mealType:'snack' },
+    { name:'Apple', emoji:'🍎', cal:80, protein:0, mealType:'snack' },
+    { name:'Greek Yoghurt', emoji:'🥛', cal:130, protein:15, mealType:'breakfast' },
+    { name:'Protein Shake', emoji:'💪', cal:160, protein:25, mealType:'snack' },
+    { name:'Rice (1 cup)', emoji:'🍚', cal:200, protein:4, mealType:'lunch' },
+    { name:'Chicken Breast', emoji:'🍖', cal:165, protein:31, mealType:'lunch' },
+    { name:'Mixed Salad', emoji:'🥗', cal:120, protein:4, mealType:'lunch' },
+    { name:'Oats (1 bowl)', emoji:'🥣', cal:300, protein:10, mealType:'breakfast' },
+  ],
+  drinks: [
+    { name:'Chiya (milk tea)', emoji:'☕', cal:80, protein:2, mealType:'snack' },
+    { name:'Coffee (black)', emoji:'☕', cal:5, protein:0, mealType:'snack' },
+    { name:'Coffee (latte)', emoji:'☕', cal:120, protein:6, mealType:'snack' },
+    { name:'Water (500ml)', emoji:'💧', cal:0, protein:0, mealType:'snack' },
+    { name:'Fruit Juice', emoji:'🧃', cal:110, protein:1, mealType:'snack' },
+    { name:'Biscuits (3)', emoji:'🍪', cal:150, protein:2, mealType:'snack' },
+  ]
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
 let currentDay = 0;
 let supabaseUrl = localStorage.getItem('sb_url') || '';
 let supabaseKey = localStorage.getItem('sb_key') || '';
+let calGoal = parseInt(localStorage.getItem('cal_goal') || '2000');
+let today = new Date().toISOString().split('T')[0];
 let weekStart = getWeekStart();
 let completions = JSON.parse(localStorage.getItem('completions_' + weekStart) || '{}');
 let logData = JSON.parse(localStorage.getItem('logdata_' + weekStart) || '{}');
+let foodLog = JSON.parse(localStorage.getItem('foodlog_' + today) || '[]');
+let metrics = JSON.parse(localStorage.getItem('metrics_' + today) || '{}');
+let customMealType = 'breakfast';
 
 function getWeekStart() {
-  const d = new Date();
-  const day = d.getDay();
+  const d = new Date(); const day = d.getDay();
   const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  const mon = new Date(d.setDate(diff));
+  const mon = new Date(d); mon.setDate(diff);
   return mon.toISOString().split('T')[0];
 }
 
-function getYouTubeId(url) {
-  if (!url) return null;
-  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
-  return m ? m[1] : url;
-}
-
-// ─────────────────────────────────────────────
-//  RENDER
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
 function init() {
-  // Set week badge
-  const d = new Date(weekStart + 'T00:00:00');
-  document.getElementById('weekBadge').textContent = 'Week of ' + d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
-
-  // Set today
-  const jsDay = new Date().getDay();
-  const dayMap = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 0: 6 };
+  const d = new Date();
+  document.getElementById('dateBadge').textContent = d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+  const jsDay = d.getDay();
+  const dayMap = {1:0,2:1,3:2,4:3,5:4,6:5,0:6};
   currentDay = dayMap[jsDay] ?? 0;
-
-  // Load config
   document.getElementById('cfgUrl').value = supabaseUrl;
   document.getElementById('cfgKey').value = supabaseKey;
-
-  renderTabs();
-  renderDay(currentDay);
-  updateProgress();
-  renderDbStatus();
+  document.getElementById('cfgCalGoal').value = calGoal;
+  if (metrics.weight) document.getElementById('metWeight').value = metrics.weight;
+  if (metrics.sleep) document.getElementById('metSleep').value = metrics.sleep;
+  if (metrics.water) document.getElementById('metWater').value = metrics.water;
+  renderTabs(); renderDay(currentDay); updateProgress();
+  renderFoodPage(); renderDash(); renderDbStatus();
 }
 
+// ═══════════════════════════════════════════════
+// WORKOUT RENDER
+// ═══════════════════════════════════════════════
 function renderTabs() {
-  const container = document.getElementById('dayTabs');
-  container.innerHTML = '';
-  DAYS.forEach((day, i) => {
+  const c = document.getElementById('dayTabs'); c.innerHTML = '';
+  DAYS.forEach((day,i) => {
     const allDone = day.activities.every(a => completions[a.id]);
     const btn = document.createElement('button');
-    btn.className = 'tab' + (i === currentDay ? ' active' : '') + (allDone ? ' completed' : '');
-    btn.style.setProperty('--accent', day.accent);
-    btn.innerHTML = day.label + '<span class="tab-check">✓</span>';
-    btn.onclick = () => { currentDay = i; renderTabs(); renderDay(i); };
-    container.appendChild(btn);
+    btn.className = 'tab'+(i===currentDay?' active':'')+(allDone?' completed':'');
+    btn.style.setProperty('--accent',day.accent);
+    btn.innerHTML = day.label+'<span class="tab-check">✓</span>';
+    btn.onclick = () => { currentDay=i; renderTabs(); renderDay(i); };
+    c.appendChild(btn);
   });
 }
 
 function renderDay(idx) {
   const day = DAYS[idx];
   document.documentElement.style.setProperty('--accent', day.accent);
-
-  const container = document.getElementById('dayContent');
-  container.innerHTML = '';
-
-  // Day header
-  const header = document.createElement('div');
-  header.className = 'day-header';
-  header.innerHTML = `
-    <h2>${day.name}</h2>
-    <p>${day.theme}</p>
-    <div class="day-stats">
-      ${day.hint.map(h => `<span class="stat-pill">${h}</span>`).join('')}
-    </div>`;
-  container.appendChild(header);
-
-  // Activities
-  const cardioActs = day.activities.filter(a => a.type === 'cardio' || a.type === 'rest' || a.type === 'bike');
-  const kbActs = day.activities.filter(a => a.type === 'kb');
-
-  if (cardioActs.length) {
-    const lbl = document.createElement('div');
-    lbl.className = 'section-label';
-    lbl.textContent = day.type === 'kb' ? '🏋️ Main Activities' : day.type === 'rest' ? '😴 Today' : '🏃 Main Activity';
-    container.appendChild(lbl);
-    cardioActs.forEach(a => container.appendChild(buildCard(a, day)));
-  }
-
-  if (kbActs.length) {
-    const lbl = document.createElement('div');
-    lbl.className = 'section-label';
-    lbl.textContent = '💪 Kettlebell (5 kg & 8 kg)';
-    container.appendChild(lbl);
-    kbActs.forEach(a => container.appendChild(buildCard(a, day)));
-  }
-
-  // Scroll tabs to active
-  setTimeout(() => {
-    const activeTab = document.querySelector('.tab.active');
-    if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }, 50);
+  const c = document.getElementById('dayContent'); c.innerHTML = '';
+  const header = document.createElement('div'); header.className = 'day-header';
+  header.innerHTML = `<h2>${day.name}</h2><p>${day.theme}</p><div class="day-stats">${day.hint.map(h=>`<span class="stat-pill">${h}</span>`).join('')}</div>`;
+  c.appendChild(header);
+  const cardio = day.activities.filter(a=>a.type!=='kb');
+  const kb = day.activities.filter(a=>a.type==='kb');
+  if(cardio.length) { const l=document.createElement('div'); l.className='section-label'; l.textContent=day.type==='rest'?'😴 Today':'🏃 Main Activity'; c.appendChild(l); cardio.forEach(a=>c.appendChild(buildCard(a,day))); }
+  if(kb.length) { const l=document.createElement('div'); l.className='section-label'; l.textContent='💪 Kettlebell (5 kg & 8 kg)'; c.appendChild(l); kb.forEach(a=>c.appendChild(buildCard(a,day))); }
+  setTimeout(()=>{ const t=document.querySelector('.tab.active'); if(t) t.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); },50);
 }
 
 function buildCard(act, day) {
   const done = !!completions[act.id];
   const saved = logData[act.id] || {};
-
   const card = document.createElement('div');
-  card.className = 'activity-card' + (done ? ' done' : '');
-  card.id = 'card_' + act.id;
-
-  // Main row
-  const main = document.createElement('div');
-  main.className = 'card-main';
-  main.innerHTML = `
-    <div class="checkbox">${done ? '✓' : ''}</div>
-    <div class="card-info">
-      <div class="card-name">${act.name}</div>
-      <div class="card-meta">${act.meta}</div>
-    </div>
-    <div class="card-actions">
-      ${act.video ? `<button class="btn-video" onclick="openVideo('${act.video}','${act.videoTitle}',event)" title="Watch video">▶</button>` : ''}
-      ${act.instructions ? `<button class="btn-info" onclick="toggleInstructions('${act.id}',event)" title="How to do it">ℹ</button>` : ''}
-    </div>`;
+  card.className = 'activity-card'+(done?' done':'');
+  card.id = 'card_'+act.id;
+  const main = document.createElement('div'); main.className='card-main';
+  main.innerHTML = `<div class="checkbox">${done?'✓':''}</div><div class="card-info"><div class="card-name">${act.name}</div><div class="card-meta">${act.meta}</div></div><div class="card-actions">${act.video?`<button class="btn-video" onclick="openVideo('${act.video}','${act.videoTitle}',event)">▶</button>`:''} ${act.instructions?`<button class="btn-info" onclick="toggleInstr('${act.id}',event)">ℹ</button>`:''}</div>`;
   main.onclick = () => toggleDone(act.id, day);
   card.appendChild(main);
-
-  // Instructions
-  if (act.instructions) {
-    const instr = document.createElement('div');
-    instr.className = 'card-instructions';
-    instr.id = 'instr_' + act.id;
-    instr.innerHTML = `
-      <div class="instructions-body">
-        <h4>How to do it</h4>
-        <ol>${act.instructions.map(i => `<li>${i}</li>`).join('')}</ol>
-        ${act.tip ? `<div class="tip">💡 ${act.tip}</div>` : ''}
-      </div>`;
+  if(act.instructions) {
+    const instr=document.createElement('div'); instr.className='card-instructions'; instr.id='instr_'+act.id;
+    instr.innerHTML=`<div class="instructions-body"><h4>How to do it</h4><ol>${act.instructions.map(i=>`<li>${i}</li>`).join('')}</ol>${act.tip?`<div class="tip">💡 ${act.tip}</div>`:''}</div>`;
     card.appendChild(instr);
   }
-
-  // Log panel (for cardio activities)
-  if (act.hasLog) {
-    const logSection = document.createElement('div');
-    logSection.className = 'log-section';
-    logSection.style.marginTop = '0';
-    logSection.style.borderRadius = '0 0 12px 12px';
-    logSection.style.border = 'none';
-    logSection.style.borderTop = '1px solid var(--border)';
-    logSection.innerHTML = `
-      <button class="log-toggle" id="logtog_${act.id}" onclick="toggleLog('${act.id}')">
-        <span style="font-size:13px">📊 Log this session</span>
-        <span>▼</span>
-      </button>
-      <div class="log-body" id="logbody_${act.id}">
-        <div class="log-grid">
-          <div class="log-field">
-            <label>Duration (min)</label>
-            <input type="number" id="log_dur_${act.id}" placeholder="37" value="${saved.duration || ''}" />
-          </div>
-          <div class="log-field">
-            <label>Distance (km)</label>
-            <input type="number" step="0.01" id="log_dist_${act.id}" placeholder="4.7" value="${saved.distance || ''}" />
-          </div>
-          <div class="log-field">
-            <label>Avg HR (bpm)</label>
-            <input type="number" id="log_hr_${act.id}" placeholder="157" value="${saved.hr || ''}" />
-          </div>
-          <div class="log-field">
-            <label>Calories</label>
-            <input type="number" id="log_cal_${act.id}" placeholder="325" value="${saved.calories || ''}" />
-          </div>
-          <div class="log-field full">
-            <label>Notes</label>
-            <textarea id="log_notes_${act.id}" placeholder="How did it feel?">${saved.notes || ''}</textarea>
-          </div>
-        </div>
-        <button class="btn-save" onclick="saveLog('${act.id}','${act.name}','${day.name}')">Save Session</button>
-        <div class="save-status" id="savestatus_${act.id}"></div>
-      </div>`;
-    card.appendChild(logSection);
+  if(act.hasLog) {
+    const ls=document.createElement('div'); ls.className='log-section';
+    ls.innerHTML=`<button class="log-toggle" id="logtog_${act.id}" onclick="toggleLog('${act.id}')"><span style="font-size:13px">📊 Log this session</span><span class="arr">▼</span></button><div class="log-body" id="logbody_${act.id}"><div class="log-grid"><div class="log-field"><label>Duration (min)</label><input type="number" id="log_dur_${act.id}" placeholder="37" value="${saved.duration||''}" /></div><div class="log-field"><label>Distance (km)</label><input type="number" step="0.01" id="log_dist_${act.id}" placeholder="4.7" value="${saved.distance||''}" /></div><div class="log-field"><label>Avg HR (bpm)</label><input type="number" id="log_hr_${act.id}" placeholder="157" value="${saved.hr||''}" /></div><div class="log-field"><label>Calories</label><input type="number" id="log_cal_${act.id}" placeholder="325" value="${saved.calories||''}" /></div><div class="log-field full"><label>Notes</label><textarea id="log_notes_${act.id}" placeholder="How did it feel?">${saved.notes||''}</textarea></div></div><button class="btn-save" onclick="saveLog('${act.id}','${act.name}','${day.name}')">Save Session</button><div class="save-status" id="savestatus_${act.id}"></div></div>`;
+    card.appendChild(ls);
   }
-
   return card;
 }
 
-// ─────────────────────────────────────────────
-//  INTERACTIONS
-// ─────────────────────────────────────────────
 function toggleDone(actId, day) {
   completions[actId] = !completions[actId];
-  localStorage.setItem('completions_' + weekStart, JSON.stringify(completions));
-
-  const card = document.getElementById('card_' + actId);
-  const cb = card.querySelector('.checkbox');
-  if (completions[actId]) {
-    card.classList.add('done');
-    cb.textContent = '✓';
-    showToast('✓ Done!');
-  } else {
-    card.classList.remove('done');
-    cb.textContent = '';
-  }
-  renderTabs();
-  updateProgress();
+  localStorage.setItem('completions_'+weekStart, JSON.stringify(completions));
+  const card=document.getElementById('card_'+actId);
+  const cb=card.querySelector('.checkbox');
+  if(completions[actId]){ card.classList.add('done'); cb.textContent='✓'; showToast('✓ Done!'); }
+  else { card.classList.remove('done'); cb.textContent=''; }
+  renderTabs(); updateProgress();
 }
-
-function toggleInstructions(actId, e) {
-  e.stopPropagation();
-  const el = document.getElementById('instr_' + actId);
-  if (el) el.classList.toggle('open');
-}
-
-function toggleLog(actId) {
-  const body = document.getElementById('logbody_' + actId);
-  const tog = document.getElementById('logtog_' + actId);
-  body.classList.toggle('open');
-  tog.classList.toggle('open');
-}
-
-function openVideo(videoId, title, e) {
-  e.stopPropagation();
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalIframe').src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-  document.getElementById('videoModal').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('videoModal').classList.remove('open');
-  document.getElementById('modalIframe').src = '';
-}
-
-document.getElementById('videoModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-// ─────────────────────────────────────────────
-//  LOGGING
-// ─────────────────────────────────────────────
-async function saveLog(actId, actName, dayName) {
-  const dur = document.getElementById('log_dur_' + actId)?.value;
-  const dist = document.getElementById('log_dist_' + actId)?.value;
-  const hr = document.getElementById('log_hr_' + actId)?.value;
-  const cal = document.getElementById('log_cal_' + actId)?.value;
-  const notes = document.getElementById('log_notes_' + actId)?.value;
-
-  const entry = { duration: dur, distance: dist, hr, calories: cal, notes };
-  logData[actId] = entry;
-  localStorage.setItem('logdata_' + weekStart, JSON.stringify(logData));
-
-  const status = document.getElementById('savestatus_' + actId);
-
-  // Save to Supabase if configured
-  if (supabaseUrl && supabaseKey) {
-    status.textContent = 'Saving...';
-    try {
-      const res = await fetch(`${supabaseUrl}/rest/v1/fitness_logs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({
-          week_start: weekStart,
-          day: dayName,
-          activity: actName,
-          done: true,
-          duration_min: dur ? parseInt(dur) : null,
-          distance_km: dist ? parseFloat(dist) : null,
-          avg_hr: hr ? parseInt(hr) : null,
-          calories: cal ? parseInt(cal) : null,
-          notes: notes || null
-        })
-      });
-      if (res.ok) {
-        status.textContent = '✓ Saved to database';
-        showToast('✓ Saved!');
-      } else {
-        status.textContent = '✓ Saved locally (DB error)';
-      }
-    } catch {
-      status.textContent = '✓ Saved locally (offline)';
-    }
-  } else {
-    status.textContent = '✓ Saved locally';
-    showToast('✓ Saved locally');
-  }
-
-  setTimeout(() => { if (status) status.textContent = ''; }, 3000);
-}
-
-// ─────────────────────────────────────────────
-//  PROGRESS
-// ─────────────────────────────────────────────
+function toggleInstr(id,e) { e.stopPropagation(); document.getElementById('instr_'+id)?.classList.toggle('open'); }
+function toggleLog(id) { document.getElementById('logbody_'+id)?.classList.toggle('open'); document.getElementById('logtog_'+id)?.classList.toggle('open'); }
 function updateProgress() {
-  const allActs = DAYS.flatMap(d => d.activities);
-  const total = allActs.length;
-  const done = allActs.filter(a => completions[a.id]).length;
-  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-  document.getElementById('progressWrap').style.display = done > 0 || true ? 'block' : 'none';
-  document.getElementById('progressText').textContent = `${done} / ${total} done`;
-  document.getElementById('progressFill').style.width = pct + '%';
+  const all=DAYS.flatMap(d=>d.activities); const total=all.length;
+  const done=all.filter(a=>completions[a.id]).length;
+  document.getElementById('progressText').textContent=`${done} / ${total} done`;
+  document.getElementById('progressFill').style.width=(total>0?Math.round(done/total*100):0)+'%';
 }
 
-// ─────────────────────────────────────────────
-//  HISTORY
-// ─────────────────────────────────────────────
-async function loadHistory() {
-  const container = document.getElementById('historyList');
-  let entries = [];
+// ═══════════════════════════════════════════════
+// FOOD PAGE
+// ═══════════════════════════════════════════════
+function renderFoodPage() {
+  renderFoodGrid('nepaliGrid', FOODS.nepali);
+  renderFoodGrid('everydayGrid', FOODS.everyday);
+  renderFoodGrid('drinksGrid', FOODS.drinks);
+  renderFoodLog();
+  updateCalSummary();
+}
 
-  if (supabaseUrl && supabaseKey) {
+function renderFoodGrid(containerId, foods) {
+  const c = document.getElementById(containerId); if(!c) return; c.innerHTML='';
+  foods.forEach(food => {
+    const btn = document.createElement('button'); btn.className='food-btn';
+    btn.innerHTML=`<span class="food-emoji">${food.emoji}</span><div class="food-name">${food.name}</div><div class="food-cals">${food.cal} kcal · ${food.protein}g protein</div>`;
+    btn.onclick = () => quickAddFood(food);
+    c.appendChild(btn);
+  });
+}
+
+function quickAddFood(food) {
+  const entry = { id: Date.now(), name: food.name, emoji: food.emoji, cal: food.cal, protein: food.protein, mealType: food.mealType, time: new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}) };
+  foodLog.push(entry);
+  localStorage.setItem('foodlog_'+today, JSON.stringify(foodLog));
+  renderFoodLog(); updateCalSummary(); renderDash();
+  showToast(`${food.emoji} Added!`);
+  saveFoodToSupabase(entry);
+}
+
+function renderFoodLog() {
+  const c = document.getElementById('foodLogList'); if(!c) return;
+  if(foodLog.length===0) { c.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No food logged yet today</div>'; return; }
+  const groups = { breakfast:[], lunch:[], dinner:[], snack:[] };
+  foodLog.forEach(e => (groups[e.mealType]||groups.snack).push(e));
+  const labels = { breakfast:'🌅 Breakfast', lunch:'☀️ Lunch', dinner:'🌙 Dinner', snack:'🍎 Snacks' };
+  c.innerHTML='';
+  Object.entries(groups).forEach(([type, items]) => {
+    if(!items.length) return;
+    const section = document.createElement('div'); section.style.marginBottom='10px';
+    const totalCal = items.reduce((s,i)=>s+i.cal,0);
+    const totalPro = items.reduce((s,i)=>s+i.protein,0);
+    section.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;display:flex;justify-content:space-between"><span>${labels[type]}</span><span style="color:var(--food);font-family:var(--mono)">${totalCal} kcal</span></div>`;
+    const list = document.createElement('div'); list.className='food-log-list';
+    items.forEach(item => {
+      const row = document.createElement('div'); row.className='food-log-item';
+      row.innerHTML=`<div><div class="food-log-name">${item.emoji||''} ${item.name}</div><div class="food-log-meta">${item.time} · ${item.protein}g protein</div></div><div style="display:flex;align-items:center;gap:8px"><span class="food-log-cals">${item.cal}</span><button class="food-log-del" onclick="removeFood(${item.id})">×</button></div>`;
+      list.appendChild(row);
+    });
+    section.appendChild(list); c.appendChild(section);
+  });
+}
+
+function removeFood(id) {
+  foodLog = foodLog.filter(f => f.id !== id);
+  localStorage.setItem('foodlog_'+today, JSON.stringify(foodLog));
+  renderFoodLog(); updateCalSummary(); renderDash();
+}
+
+function updateCalSummary() {
+  const eaten = foodLog.reduce((s,f)=>s+f.cal,0);
+  const burned = getTodayBurned();
+  const net = eaten - burned;
+  document.getElementById('calEaten').textContent = eaten;
+  document.getElementById('calBurned').textContent = burned;
+  document.getElementById('calNet').textContent = net;
+  document.getElementById('calNet').style.color = net < 0 ? 'var(--run)' : net > calGoal ? 'var(--longrun)' : 'var(--white)';
+  const pct = Math.min(100, Math.round(eaten/calGoal*100));
+  document.getElementById('calFill').style.width = pct+'%';
+  document.getElementById('calFill').style.background = pct>100 ? 'var(--longrun)' : pct>75 ? 'var(--kb)' : 'var(--food)';
+  document.getElementById('calGoalLine').textContent = `Goal: ${calGoal} kcal · ${pct}% reached`;
+}
+
+function getTodayBurned() {
+  let total = 0;
+  DAYS.forEach(day => {
+    day.activities.forEach(act => {
+      if(act.hasLog && completions[act.id]) {
+        const saved = logData[act.id];
+        if(saved && saved.calories) total += parseInt(saved.calories)||0;
+      }
+    });
+  });
+  return total;
+}
+
+// Custom Food
+function openCustomFood() { document.getElementById('customFoodModal').classList.add('open'); }
+function closeCustomFood() { document.getElementById('customFoodModal').classList.remove('open'); }
+function selectChip(el, key, val) {
+  el.closest('.chip-row').querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  if(key==='mealType') customMealType=val;
+}
+function addCustomFood() {
+  const name=document.getElementById('customFoodName').value.trim();
+  const cal=parseInt(document.getElementById('customFoodCal').value)||0;
+  const protein=parseInt(document.getElementById('customFoodPro').value)||0;
+  if(!name) { showToast('⚠️ Enter a food name'); return; }
+  quickAddFood({ name, emoji:'🍽️', cal, protein, mealType: customMealType });
+  document.getElementById('customFoodName').value='';
+  document.getElementById('customFoodCal').value='';
+  document.getElementById('customFoodPro').value='';
+  closeCustomFood();
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDash() {
+  const eaten = foodLog.reduce((s,f)=>s+f.cal,0);
+  const burned = getTodayBurned();
+  const water = metrics.water || 0;
+  const sleep = metrics.sleep || 0;
+  const weight = metrics.weight || 0;
+  const allActs = DAYS.flatMap(d=>d.activities);
+  const doneCount = allActs.filter(a=>completions[a.id]).length;
+  const totalCount = allActs.length;
+
+  // Rings
+  const ringsRow = document.getElementById('ringsRow'); if(!ringsRow) return;
+  const rings = [
+    { label:'Workout', val:Math.round(doneCount/totalCount*100), color:'var(--run)', display:doneCount+'/'+totalCount },
+    { label:'Calories', val:Math.min(100,Math.round(eaten/calGoal*100)), color:'var(--food)', display:eaten+' kcal' },
+    { label:'Water', val:Math.min(100,Math.round(water/2000*100)), color:'var(--bike)', display:(water/1000).toFixed(1)+'L' },
+  ];
+  ringsRow.innerHTML = rings.map(r=>`
+    <div class="ring-wrap">
+      <svg width="70" height="70" viewBox="0 0 70 70">
+        <circle cx="35" cy="35" r="28" fill="none" stroke="var(--border)" stroke-width="8"/>
+        <circle cx="35" cy="35" r="28" fill="none" stroke="${r.color}" stroke-width="8" stroke-dasharray="${Math.round(r.val/100*175.9)} 175.9" stroke-linecap="round" transform="rotate(-90 35 35)"/>
+        <text x="35" y="39" text-anchor="middle" fill="var(--white)" font-size="12" font-family="var(--mono)" font-weight="700">${r.val}%</text>
+      </svg>
+      <div class="ring-val" style="color:${r.color}">${r.display}</div>
+      <div class="ring-label">${r.label}</div>
+    </div>`).join('');
+
+  // Stat cards
+  const dashGrid = document.getElementById('dashGrid'); if(!dashGrid) return;
+  const cards = [
+    { label:'Net Calories', val: eaten-burned, unit:'kcal', color: (eaten-burned)<0?'var(--run)':'var(--white)', sub: burned>0?`Burned ${burned} kcal`:'Log a workout to see burn' },
+    { label:'Weight', val: weight||'—', unit: weight?'kg':'', color:'var(--kb)', sub: weight?'Today\'s reading':'Not logged yet' },
+    { label:'Sleep', val: sleep||'—', unit: sleep?'hrs':'', color:'var(--rest)', sub: sleep?(sleep>=7?'Great sleep 💜':'Aim for 7+ hrs'):'Not logged yet' },
+    { label:'Water', val: water>=1000?(water/1000).toFixed(1):water||'0', unit: water>=1000?'L':'ml', color:'var(--bike)', sub: water>=2000?'Hydrated! 💧':water>0?`${2000-water}ml to go`:'Start logging' },
+  ];
+  dashGrid.innerHTML = cards.map(c=>`<div class="dash-card"><h4>${c.label}</h4><div class="dash-val" style="color:${c.color}">${c.val}<span class="dash-unit"> ${c.unit}</span></div><div class="dash-sub">${c.sub}</div></div>`).join('');
+
+  // Weight chart (simple)
+  renderWeightChart();
+}
+
+function renderWeightChart() {
+  const canvas = document.getElementById('weightChart');
+  const noData = document.getElementById('noWeightData');
+  const weights = [];
+  for(let i=6; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const key = d.toISOString().split('T')[0];
+    const m = JSON.parse(localStorage.getItem('metrics_'+key)||'{}');
+    if(m.weight) weights.push({ date: d.toLocaleDateString('en-AU',{weekday:'short'}), w: m.weight });
+  }
+  if(weights.length < 2) { canvas.style.display='none'; noData.style.display='block'; return; }
+  canvas.style.display='block'; noData.style.display='none';
+  const ctx = canvas.getContext('2d');
+  const W=canvas.offsetWidth; const H=120;
+  canvas.width=W; canvas.height=H;
+  ctx.clearRect(0,0,W,H);
+  const vals = weights.map(w=>w.w);
+  const minW=Math.min(...vals)-1; const maxW=Math.max(...vals)+1;
+  const xStep=W/(weights.length-1);
+  const yScale=v=>(H-20)-((v-minW)/(maxW-minW))*(H-40);
+  ctx.strokeStyle='#22C55E'; ctx.lineWidth=2; ctx.beginPath();
+  weights.forEach((w,i)=>{ const x=i*xStep; const y=yScale(w.w); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.stroke();
+  weights.forEach((w,i)=>{ const x=i*xStep; const y=yScale(w.w); ctx.fillStyle='#22C55E'; ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill(); ctx.fillStyle='var(--muted)'; ctx.font='10px Arial'; ctx.textAlign='center'; ctx.fillText(w.date,x,H-2); ctx.fillStyle='#fff'; ctx.fillText(w.w,x,y-8); });
+}
+
+// ═══════════════════════════════════════════════
+// METRICS
+// ═══════════════════════════════════════════════
+function addWater(ml) {
+  const input = document.getElementById('metWater');
+  input.value = (parseInt(input.value)||0) + ml;
+  metrics.water = parseInt(input.value);
+  localStorage.setItem('metrics_'+today, JSON.stringify(metrics));
+  renderDash(); showToast(`💧 +${ml}ml`);
+  saveMetricsToSupabase();
+}
+
+async function saveMetrics() {
+  metrics.weight = parseFloat(document.getElementById('metWeight').value)||null;
+  metrics.sleep = parseFloat(document.getElementById('metSleep').value)||null;
+  metrics.water = parseInt(document.getElementById('metWater').value)||null;
+  localStorage.setItem('metrics_'+today, JSON.stringify(metrics));
+  renderDash(); showToast('✓ Metrics saved!');
+  const s = document.getElementById('metStatus');
+  await saveMetricsToSupabase();
+  s.textContent = supabaseUrl ? '✓ Saved to database' : '✓ Saved locally';
+  setTimeout(()=>{ if(s) s.textContent=''; },2500);
+}
+
+async function saveMetricsToSupabase() {
+  if(!supabaseUrl||!supabaseKey) return;
+  try {
+    await fetch(`${supabaseUrl}/rest/v1/daily_metrics`, {
+      method:'POST', headers:{'Content-Type':'application/json','apikey':supabaseKey,'Authorization':`Bearer ${supabaseKey}`,'Prefer':'resolution=merge-duplicates'},
+      body: JSON.stringify({ log_date:today, weight_kg:metrics.weight, water_ml:metrics.water, sleep_hrs:metrics.sleep })
+    });
+  } catch {}
+}
+
+async function saveFoodToSupabase(entry) {
+  if(!supabaseUrl||!supabaseKey) return;
+  try {
+    await fetch(`${supabaseUrl}/rest/v1/food_logs`, {
+      method:'POST', headers:{'Content-Type':'application/json','apikey':supabaseKey,'Authorization':`Bearer ${supabaseKey}`,'Prefer':'return=minimal'},
+      body: JSON.stringify({ log_date:today, meal_type:entry.mealType, food_name:entry.name, calories:entry.cal, protein_g:entry.protein })
+    });
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════
+// WORKOUT LOG
+// ═══════════════════════════════════════════════
+async function saveLog(actId, actName, dayName) {
+  const dur=document.getElementById('log_dur_'+actId)?.value;
+  const dist=document.getElementById('log_dist_'+actId)?.value;
+  const hr=document.getElementById('log_hr_'+actId)?.value;
+  const cal=document.getElementById('log_cal_'+actId)?.value;
+  const notes=document.getElementById('log_notes_'+actId)?.value;
+  logData[actId]={ duration:dur, distance:dist, hr, calories:cal, notes };
+  localStorage.setItem('logdata_'+weekStart, JSON.stringify(logData));
+  updateCalSummary(); renderDash();
+  const status=document.getElementById('savestatus_'+actId);
+  if(supabaseUrl&&supabaseKey) {
+    status.textContent='Saving...';
     try {
-      const res = await fetch(`${supabaseUrl}/rest/v1/fitness_logs?select=*&order=created_at.desc&limit=100`, {
-        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
-      });
-      if (res.ok) entries = await res.json();
+      const res=await fetch(`${supabaseUrl}/rest/v1/fitness_logs`,{method:'POST',headers:{'Content-Type':'application/json','apikey':supabaseKey,'Authorization':`Bearer ${supabaseKey}`,'Prefer':'return=minimal'},body:JSON.stringify({week_start:weekStart,day:dayName,activity:actName,done:true,duration_min:dur?parseInt(dur):null,distance_km:dist?parseFloat(dist):null,avg_hr:hr?parseInt(hr):null,calories:cal?parseInt(cal):null,notes:notes||null})});
+      status.textContent = res.ok ? '✓ Saved to database' : '✓ Saved locally';
+    } catch { status.textContent='✓ Saved locally'; }
+  } else { status.textContent='✓ Saved locally'; }
+  showToast('✓ Session saved!');
+  setTimeout(()=>{ if(status) status.textContent=''; },3000);
+}
+
+// ═══════════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════════
+async function loadHistory() {
+  const c=document.getElementById('historyList'); let entries=[];
+  if(supabaseUrl&&supabaseKey) {
+    try {
+      const res=await fetch(`${supabaseUrl}/rest/v1/fitness_logs?select=*&order=created_at.desc&limit=100`,{headers:{'apikey':supabaseKey,'Authorization':`Bearer ${supabaseKey}`}});
+      if(res.ok) entries=await res.json();
     } catch {}
   }
-
-  // Also include local data
-  const localEntries = [];
-  for (let key in localStorage) {
-    if (key.startsWith('logdata_')) {
-      const weekOf = key.replace('logdata_', '');
-      const data = JSON.parse(localStorage.getItem(key) || '{}');
-      const comps = JSON.parse(localStorage.getItem('completions_' + weekOf) || '{}');
-      for (let actId in data) {
-        const dayData = DAYS.flatMap(d => d.activities).find(a => a.id === actId);
-        if (dayData && (data[actId].duration || data[actId].distance)) {
-          localEntries.push({ week_start: weekOf, activity: dayData.name, ...data[actId], _local: true });
-        }
+  if(!entries.length) {
+    const local=[];
+    for(let key in localStorage) {
+      if(key.startsWith('logdata_')) {
+        const w=key.replace('logdata_',''); const data=JSON.parse(localStorage.getItem(key)||'{}');
+        for(let id in data) { const act=DAYS.flatMap(d=>d.activities).find(a=>a.id===id); if(act&&(data[id].duration||data[id].distance)) local.push({week_start:w,activity:act.name,...data[id]}); }
       }
     }
+    entries=local;
   }
-
-  const allEntries = entries.length > 0 ? entries : localEntries;
-
-  if (allEntries.length === 0) {
-    container.innerHTML = '<div class="history-empty">No sessions logged yet.<br>Complete activities and save your stats to see history here.</div>';
-    return;
-  }
-
-  // Group by week
-  const byWeek = {};
-  allEntries.forEach(e => {
-    const w = e.week_start || 'Unknown week';
-    if (!byWeek[w]) byWeek[w] = [];
-    byWeek[w].push(e);
-  });
-
-  container.innerHTML = '';
-  Object.keys(byWeek).sort().reverse().forEach(week => {
-    const entries = byWeek[week];
-    const d = new Date(week + 'T00:00:00');
-    const weekLabel = 'Week of ' + d.toLocaleDateString('en-AU', { day: 'numeric', month: 'long' });
-
-    const block = document.createElement('div');
-    block.className = 'history-week';
-    block.innerHTML = `
-      <div class="history-week-header">
-        <h4>${weekLabel}</h4>
-        <span>${entries.length} sessions</span>
-      </div>`;
-
-    entries.forEach(e => {
-      const row = document.createElement('div');
-      row.className = 'history-entry';
-      const stats = [
-        e.duration_min || e.duration ? `${e.duration_min || e.duration} min` : '',
-        e.distance_km || e.distance ? `${e.distance_km || e.distance} km` : '',
-        e.avg_hr || e.hr ? `${e.avg_hr || e.hr} bpm` : '',
-        e.calories ? `${e.calories} kcal` : '',
-      ].filter(Boolean).join(' · ');
-
-      row.innerHTML = `
-        <div>
-          <div class="history-entry-name">${e.activity || e.day}</div>
-          <div class="history-entry-meta">${e.day || ''} ${e.notes ? '· ' + e.notes : ''}</div>
-        </div>
-        <div class="history-entry-stats">${stats}</div>`;
-      block.appendChild(row);
-    });
-
-    container.appendChild(block);
+  if(!entries.length){ c.innerHTML='<div class="history-empty">No sessions logged yet.<br>Save your stats after workouts to see history.</div>'; return; }
+  const byWeek={};
+  entries.forEach(e=>{ const w=e.week_start||'Unknown'; if(!byWeek[w]) byWeek[w]=[]; byWeek[w].push(e); });
+  c.innerHTML='';
+  Object.keys(byWeek).sort().reverse().forEach(week=>{
+    const items=byWeek[week];
+    const d=new Date(week+'T00:00:00');
+    const block=document.createElement('div'); block.className='history-week';
+    block.innerHTML=`<div class="history-week-header"><h4>Week of ${d.toLocaleDateString('en-AU',{day:'numeric',month:'long'})}</h4><span>${items.length} sessions</span></div>`;
+    items.forEach(e=>{ const row=document.createElement('div'); row.className='history-entry'; const stats=[e.duration_min||e.duration?`${e.duration_min||e.duration} min`:'',e.distance_km||e.distance?`${e.distance_km||e.distance} km`:'',e.avg_hr||e.hr?`${e.avg_hr||e.hr} bpm`:'',e.calories?`${e.calories} kcal`:''].filter(Boolean).join(' · '); row.innerHTML=`<div><div class="history-entry-name">${e.activity}</div><div class="history-entry-meta">${e.day||''}</div></div><div class="history-entry-stats">${stats}</div>`; block.appendChild(row); });
+    c.appendChild(block);
   });
 }
 
-// ─────────────────────────────────────────────
-//  CONFIG
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════
 async function saveConfig() {
-  const url = document.getElementById('cfgUrl').value.trim().replace(/\/$/, '');
-  const key = document.getElementById('cfgKey').value.trim();
-  const status = document.getElementById('cfgStatus');
-
-  if (!url || !key) { status.textContent = '⚠️ Both fields are required'; return; }
-
-  status.textContent = 'Testing connection...';
+  const url=document.getElementById('cfgUrl').value.trim().replace(/\/$/,'');
+  const key=document.getElementById('cfgKey').value.trim();
+  const s=document.getElementById('cfgStatus');
+  if(!url||!key){ s.textContent='⚠️ Both fields required'; return; }
+  s.textContent='Testing...';
   try {
-    const res = await fetch(`${url}/rest/v1/fitness_logs?select=count&limit=1`, {
-      headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
-    });
-    if (res.ok || res.status === 406) {
-      supabaseUrl = url;
-      supabaseKey = key;
-      localStorage.setItem('sb_url', url);
-      localStorage.setItem('sb_key', key);
-      status.textContent = '✓ Connected! Database ready.';
-      renderDbStatus();
-      showToast('✓ Database connected!');
-    } else {
-      status.textContent = `⚠️ Error ${res.status} — check your URL and key`;
-    }
-  } catch (err) {
-    status.textContent = '⚠️ Could not connect — check URL';
-  }
+    const res=await fetch(`${url}/rest/v1/fitness_logs?select=count&limit=1`,{headers:{'apikey':key,'Authorization':`Bearer ${key}`}});
+    if(res.ok||res.status===406){ supabaseUrl=url; supabaseKey=key; localStorage.setItem('sb_url',url); localStorage.setItem('sb_key',key); s.textContent='✓ Connected! Database ready.'; renderDbStatus(); showToast('✓ Connected!'); }
+    else s.textContent=`⚠️ Error ${res.status}`;
+  } catch { s.textContent='⚠️ Could not connect'; }
+}
+
+function saveCalGoal() {
+  calGoal=parseInt(document.getElementById('cfgCalGoal').value)||2000;
+  localStorage.setItem('cal_goal',calGoal);
+  updateCalSummary(); renderDash(); showToast('✓ Goal saved!');
 }
 
 function renderDbStatus() {
-  const badge = document.getElementById('dbStatusBadge');
-  if (!badge) return;
-  if (supabaseUrl && supabaseKey) {
-    badge.innerHTML = '<div class="db-status connected"><div class="db-dot"></div>Supabase connected</div>';
-  } else {
-    badge.innerHTML = '<div class="db-status"><div class="db-dot"></div>Not connected — saving locally</div>';
-  }
+  const b=document.getElementById('dbStatusBadge'); if(!b) return;
+  b.innerHTML=supabaseUrl?'<div class="db-status connected"><div class="db-dot"></div>Supabase connected</div>':'<div class="db-status"><div class="db-dot"></div>Not connected</div>';
 }
 
-// ─────────────────────────────────────────────
-//  NAVIGATION
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════
+// NAVIGATION & UTILS
+// ═══════════════════════════════════════════════
 function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
   btn.classList.add('active');
-
-  if (name === 'history') loadHistory();
+  if(name==='history') loadHistory();
+  if(name==='dash') renderDash();
+  if(name==='food') { renderFoodPage(); }
 }
-
-// ─────────────────────────────────────────────
-//  TOAST
-// ─────────────────────────────────────────────
+function openVideo(id,title,e){ e.stopPropagation(); document.getElementById('modalTitle').textContent=title; document.getElementById('modalIframe').src=`https://www.youtube.com/embed/${id}?autoplay=1`; document.getElementById('videoModal').classList.add('open'); }
+function closeModal(){ document.getElementById('videoModal').classList.remove('open'); document.getElementById('modalIframe').src=''; }
+document.getElementById('videoModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
 let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
-}
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2000); }
 
-// ─────────────────────────────────────────────
-//  START
-// ─────────────────────────────────────────────
 init();
 </script>
 </body>
